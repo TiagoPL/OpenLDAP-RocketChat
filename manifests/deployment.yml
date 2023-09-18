@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: password-check
+  namespace: treinamento-microservices
+  labels:
+    app: password-check
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: password-check
+      
+  strategy:
+    type: RollingUpdate
+    
+  template:
+    metadata:
+      labels:
+        app: password-check
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: domain
+                operator: In
+                values:
+                - up_conn
+      containers:
+      - image: harbor.domain.com.br/password-expiration-check/password-expiration-check:3.1
+        name: password-check
+        ports:
+        - containerPort: 5000
+          name: http
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 125m
+          limits:
+            memory: 500Mi
+            cpu: 500m
+        envFrom:
+        - secretRef:
+            name: password-check-secret
+            
+      imagePullSecrets:
+      - name: harbor
+

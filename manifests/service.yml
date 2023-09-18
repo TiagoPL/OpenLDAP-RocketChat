@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  namespace: treinamento-microservices
+  name: password-check-svc
+  labels:
+    app: password-check
+    
+spec:
+  selector:
+    app: password-check
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
